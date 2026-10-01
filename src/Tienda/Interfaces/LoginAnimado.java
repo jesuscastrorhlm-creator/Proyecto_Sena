@@ -1,0 +1,818 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package Tienda.Interfaces;
+
+import Tienda.PanelRedondeado;
+import Tienda.Conexion;
+import Tienda.Interfaces.PanelAdministrador;
+import Tienda.PanelFondo;
+import Tienda.SesionActual;
+import Tienda.Interfaces.VentanaInicioCliente;
+import java.awt.Color;
+import java.awt.Cursor;
+
+/**
+ *
+ * @author juanc
+ */
+public class LoginAnimado extends javax.swing.JFrame {
+    private boolean mostrandoRegistro = false;
+private int velocidad = 23;
+private PanelRedondeado panelCajaLogin;
+private javax.swing.JCheckBox chkRecordar;
+private javax.swing.JPopupMenu menuCuentas;
+private boolean rellenando = false;
+
+private void asegurarRegistro() {
+    mostrandoRegistro = true;
+
+    panelLogin.setLocation(-panelLogin.getWidth(), 0);
+    panelRegistro.setLocation(0, 0);
+}
+private void mostrarRegistro() {
+
+    if (mostrandoRegistro) {
+    asegurarRegistro();   // <- agrega esta línea
+    return;
+}
+
+    mostrandoRegistro = true;
+
+    panelLogin.setLocation(0, 0);
+    panelRegistro.setLocation(panelRegistro.getWidth(), 0);
+
+    javax.swing.Timer timer = new javax.swing.Timer(10, null);
+
+    timer.addActionListener(e -> {
+
+        int xLogin = panelLogin.getX();
+        int xRegistro = panelRegistro.getX();
+
+        panelLogin.setLocation(xLogin - velocidad, 0);
+        panelRegistro.setLocation(xRegistro - velocidad, 0);
+
+        if (xRegistro <= 0) {
+
+            panelLogin.setLocation(
+                -panelLogin.getWidth(),
+                0
+            );
+
+            panelRegistro.setLocation(
+                0,
+                0
+            );
+
+            timer.stop();
+        }
+    });
+
+    timer.start();
+}
+    private void mostrarLogin() {
+
+    if (!mostrandoRegistro) {
+        return;
+    }
+
+    javax.swing.Timer timer = new javax.swing.Timer(10, null);
+
+    timer.addActionListener(e -> {
+
+        int xLogin = panelLogin.getX();
+        int xRegistro = panelRegistro.getX();
+
+        if (xLogin < 0) {
+
+            panelLogin.setLocation(xLogin + velocidad, 0);
+            panelRegistro.setLocation(xRegistro + velocidad, 0);
+
+        } else {
+
+            panelLogin.setLocation(0, 0);
+            panelRegistro.setLocation(panelRegistro.getWidth(), 0);
+
+            mostrandoRegistro = false;
+            timer.stop();
+        }
+    });
+
+    timer.start();
+}
+
+    /**
+     * Creates new form LoginAnimado
+     */
+public LoginAnimado() {
+    setContentPane(new PanelFondo("/Tienda/Imagenes/fondo_abarrotes.png"));
+    initComponents();
+
+    // Caja del login (un poco más clara / transparente que antes)
+    panelCajaLogin = new PanelRedondeado(
+        new java.awt.Color(255, 255, 255, 90),
+        35
+    );
+
+    panelLogin.add(
+        panelCajaLogin,
+        new org.netbeans.lib.awtextra.AbsoluteConstraints(
+            140, 270, 720, 350
+        )
+    );
+
+panelLogin.setComponentZOrder(panelCajaLogin, panelLogin.getComponentCount() - 1);   
+panelLogin.repaint();
+
+    // Caja del registro (un poco más clara que la del login)
+    PanelRedondeado panelCajaRegistro = new PanelRedondeado(
+        new java.awt.Color(255, 255, 255, 90),
+        35
+    );
+
+    panelRegistro.add(
+        panelCajaRegistro,
+        new org.netbeans.lib.awtextra.AbsoluteConstraints(
+            170, 50, 680, 610
+        )
+    );
+
+panelRegistro.setComponentZOrder(panelCajaRegistro, panelRegistro.getComponentCount() - 1);
+panelRegistro.repaint();
+    
+    // Botón Ingresar: rojo del logo
+Tienda.EstiloUI.botonPrimario(btnIniciarSesion);
+
+// Botón Crear Cuenta: amarillo del logo (texto oscuro)
+Tienda.EstiloUI.botonAcento(btnIrRegistro);
+
+// Botón Ya tengo cuenta: rojo oscuro
+Tienda.EstiloUI.botonSecundario(btnIrLogin);
+
+// Botón Registrar: rojo del logo
+Tienda.EstiloUI.botonPrimario(btnRegistrar);
+    txtCorreoLogin.addActionListener(e -> txtContraseñaLogin.requestFocusInWindow());
+    txtContraseñaLogin.addActionListener(this::btnIniciarSesionActionPerformed);
+    
+    // Nombre -> Telefono -> Correo -> Contraseña -> Registrar
+    txtNombreRegistro.addActionListener(e -> txtTelefonoRegistro.requestFocusInWindow());
+    txtTelefonoRegistro.addActionListener(e -> txtCorreoRegistro.requestFocusInWindow());
+    txtCorreoRegistro.addActionListener(e -> txtContraseñaRegistro.requestFocusInWindow());
+    txtContraseñaRegistro.addActionListener(this::btnRegistrarActionPerformed);
+
+    setSize(1000, 700);
+
+    panelLogin.setLocation(0, 0);
+    panelRegistro.setLocation(panelLogin.getWidth(), 0);
+
+    panelLogin.setOpaque(false);
+    panelRegistro.setOpaque(false);
+
+    configurarCuentasRecordadas();
+}
+    
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel2 = new javax.swing.JPanel();
+        pnlAnimacion = new javax.swing.JPanel();
+        panelLogin = new javax.swing.JPanel();
+        txtCorreoLogin = new javax.swing.JTextField();
+        btnIniciarSesion = new javax.swing.JButton();
+        lblLogo = new javax.swing.JLabel();
+        txtContraseñaLogin = new javax.swing.JPasswordField();
+        lblCorreo = new javax.swing.JLabel();
+        lblContraseña = new javax.swing.JLabel();
+        btnIrRegistro = new javax.swing.JButton();
+        panelRegistro = new javax.swing.JPanel();
+        txtNombreRegistro = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        lblNombre1 = new javax.swing.JLabel();
+        txtTelefonoRegistro = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        txtContraseñaRegistro = new javax.swing.JPasswordField();
+        lblNombre = new javax.swing.JLabel();
+        lblCorreo1 = new javax.swing.JLabel();
+        lblContraseña1 = new javax.swing.JLabel();
+        txtCorreoRegistro = new javax.swing.JTextField();
+        btnRegistrar = new javax.swing.JButton();
+        btnIrLogin = new javax.swing.JButton();
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Galapa EXPRESS\n");
+        setMinimumSize(new java.awt.Dimension(940, 500));
+        setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        pnlAnimacion.setBackground(new java.awt.Color(255, 255, 255));
+        pnlAnimacion.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        getContentPane().add(pnlAnimacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 45, -1, 456));
+
+        panelLogin.setBackground(new java.awt.Color(255, 204, 204));
+        panelLogin.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        txtCorreoLogin.setText("Ingrese correo electronico");
+        txtCorreoLogin.addActionListener(this::txtCorreoLoginActionPerformed);
+        panelLogin.add(txtCorreoLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 340, 350, 30));
+
+        btnIniciarSesion.setBackground(new java.awt.Color(204, 0, 51));
+        btnIniciarSesion.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnIniciarSesion.setText("Ingresar");
+        btnIniciarSesion.addActionListener(this::btnIniciarSesionActionPerformed);
+        panelLogin.add(btnIniciarSesion, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 520, 100, 40));
+
+        lblLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Tienda/Imagenes/logo_galapa.png"))); // NOI18N
+        panelLogin.add(lblLogo, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 50, 420, 200));
+        panelLogin.add(txtContraseñaLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 450, 350, 30));
+
+        lblCorreo.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblCorreo.setText("Correo:");
+        panelLogin.add(lblCorreo, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 300, -1, -1));
+
+        lblContraseña.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblContraseña.setText("Contraseña:");
+        panelLogin.add(lblContraseña, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 410, -1, -1));
+
+        btnIrRegistro.setBackground(new java.awt.Color(255, 204, 0));
+        btnIrRegistro.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnIrRegistro.setText("Crear Cuenta");
+        btnIrRegistro.addActionListener(this::btnIrRegistroActionPerformed);
+        panelLogin.add(btnIrRegistro, new org.netbeans.lib.awtextra.AbsoluteConstraints(441, 520, 180, 40));
+
+        getContentPane().add(panelLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, 680));
+
+        panelRegistro.setBackground(new java.awt.Color(204, 255, 255));
+        panelRegistro.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        txtNombreRegistro.addActionListener(this::txtNombreRegistroActionPerformed);
+        panelRegistro.add(txtNombreRegistro, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 220, 230, 30));
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Tienda/Imagenes/icono_galapa_.png"))); // NOI18N
+        panelRegistro.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 0, 220, 190));
+
+        lblNombre1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblNombre1.setText("Telefono :");
+        panelRegistro.add(lblNombre1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 280, -1, -1));
+
+        txtTelefonoRegistro.addActionListener(this::txtTelefonoRegistroActionPerformed);
+        panelRegistro.add(txtTelefonoRegistro, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 280, 230, 30));
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        jLabel1.setText("REGISTRO");
+        panelRegistro.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 80, -1, -1));
+
+        txtContraseñaRegistro.addActionListener(this::txtContraseñaRegistroActionPerformed);
+        panelRegistro.add(txtContraseñaRegistro, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 420, 230, 30));
+
+        lblNombre.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblNombre.setText("Nombre:");
+        panelRegistro.add(lblNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 220, -1, -1));
+
+        lblCorreo1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblCorreo1.setText("Correo:");
+        panelRegistro.add(lblCorreo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 350, -1, -1));
+
+        lblContraseña1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblContraseña1.setText("Contraseña:");
+        panelRegistro.add(lblContraseña1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 420, -1, -1));
+
+        txtCorreoRegistro.addActionListener(this::txtCorreoRegistroActionPerformed);
+        panelRegistro.add(txtCorreoRegistro, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 352, 230, 30));
+
+        btnRegistrar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnRegistrar.setText("Registrar");
+        btnRegistrar.addActionListener(this::btnRegistrarActionPerformed);
+        panelRegistro.add(btnRegistrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 510, -1, 40));
+
+        btnIrLogin.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnIrLogin.setText("Ya tengo cuenta");
+        btnIrLogin.addActionListener(this::btnIrLoginActionPerformed);
+        panelRegistro.add(btnIrLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 510, 190, 40));
+
+        getContentPane().add(panelRegistro, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 10, 1000, 680));
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    // ===== Cuentas recordadas: sugerencias al hacer clic en el campo de correo =====
+    private void configurarCuentasRecordadas() {
+        chkRecordar = new javax.swing.JCheckBox("Recordar mi cuenta en este equipo");
+        chkRecordar.setFont(new java.awt.Font("Segoe UI", 0, 14));
+        chkRecordar.setOpaque(false);
+        chkRecordar.setFocusPainted(false);
+        panelLogin.add(chkRecordar, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 487, 350, 25));
+
+        // La caja redondeada de fondo debe quedar detrás de todo
+        panelLogin.setComponentZOrder(panelCajaLogin, panelLogin.getComponentCount() - 1);
+        panelLogin.repaint();
+
+        menuCuentas = new javax.swing.JPopupMenu();
+        menuCuentas.setFocusable(false);
+
+        txtCorreoLogin.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                javax.swing.SwingUtilities.invokeLater(() -> mostrarCuentas());
+            }
+        });
+        txtCorreoLogin.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                mostrarCuentas();
+            }
+        });
+        txtCorreoLogin.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            private void cambio() {
+                if (!rellenando) {
+                    javax.swing.SwingUtilities.invokeLater(() -> mostrarCuentas());
+                }
+            }
+            @Override public void insertUpdate(javax.swing.event.DocumentEvent e) { cambio(); }
+            @Override public void removeUpdate(javax.swing.event.DocumentEvent e) { cambio(); }
+            @Override public void changedUpdate(javax.swing.event.DocumentEvent e) { cambio(); }
+        });
+        txtContraseñaLogin.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                menuCuentas.setVisible(false);
+            }
+        });
+    }
+
+    private void mostrarCuentas() {
+        if (!txtCorreoLogin.isShowing() || mostrandoRegistro) {
+            return;
+        }
+
+        String filtro = txtCorreoLogin.getText().trim().toLowerCase();
+        menuCuentas.setVisible(false);
+        menuCuentas.removeAll();
+
+        boolean hayCuentas = false;
+        for (String correo : Tienda.CuentasRecordadas.listar()) {
+            if (!filtro.isEmpty() && !correo.toLowerCase().contains(filtro)) {
+                continue;
+            }
+            hayCuentas = true;
+            javax.swing.JMenuItem item = new javax.swing.JMenuItem(correo);
+            item.setFont(new java.awt.Font("Segoe UI", 0, 15));
+            item.setPreferredSize(new java.awt.Dimension(txtCorreoLogin.getWidth(), 30));
+            item.addActionListener(ev -> elegirCuenta(correo));
+            menuCuentas.add(item);
+        }
+
+        if (!hayCuentas) {
+            return;
+        }
+
+        menuCuentas.addSeparator();
+        javax.swing.JMenuItem olvidar = new javax.swing.JMenuItem("Olvidar cuentas guardadas");
+        olvidar.setFont(new java.awt.Font("Segoe UI", 2, 13));
+        olvidar.setPreferredSize(new java.awt.Dimension(txtCorreoLogin.getWidth(), 28));
+        olvidar.addActionListener(ev -> {
+            int r = javax.swing.JOptionPane.showConfirmDialog(this,
+                    "¿Borrar todas las cuentas recordadas en este equipo?",
+                    "Olvidar cuentas", javax.swing.JOptionPane.YES_NO_OPTION);
+            if (r == javax.swing.JOptionPane.YES_OPTION) {
+                Tienda.CuentasRecordadas.borrarTodas();
+            }
+        });
+        menuCuentas.add(olvidar);
+
+        menuCuentas.show(txtCorreoLogin, 0, txtCorreoLogin.getHeight());
+    }
+
+    private void elegirCuenta(String correo) {
+        rellenando = true;
+        txtCorreoLogin.setText(correo);
+        String contrasena = Tienda.CuentasRecordadas.obtenerContrasena(correo);
+        txtContraseñaLogin.setText(contrasena == null ? "" : contrasena);
+        chkRecordar.setSelected(true);
+        rellenando = false;
+
+        menuCuentas.setVisible(false);
+        txtContraseñaLogin.requestFocusInWindow();
+    }
+
+    private void txtCorreoLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCorreoLoginActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCorreoLoginActionPerformed
+
+    private void btnIniciarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarSesionActionPerformed
+        // TODO add your handling code here:
+        String correo = txtCorreoLogin.getText().trim().toLowerCase();
+        String contrasena = new String(txtContraseñaLogin.getPassword()).trim();
+
+        if (correo.isEmpty() || contrasena.isEmpty()) {
+
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Completa todos los campos");
+                 asegurarRegistro();
+            return;
+        }
+
+        if (!correo.equals("admin") && !correo.contains("@")) {
+
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "El correo debe contener @");
+
+            return;
+        }
+
+        if (!correo.equals("admin") && !correo.toLowerCase().contains("gmail")) {
+
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "El correo debe ser de gmail");
+
+            return;
+        }
+
+        // Ingreso del administrador
+                try {
+
+            java.sql.Connection conexion = Conexion.conectar();
+
+            String sql = "SELECT * FROM Usuario WHERE usuario = ? AND contrasena = ?";
+
+            java.sql.PreparedStatement sentencia =
+            conexion.prepareStatement(sql);
+
+            sentencia.setString(1, correo);
+            sentencia.setString(2, contrasena);
+
+            java.sql.ResultSet resultado = sentencia.executeQuery();
+
+            if (resultado.next()) {
+
+                int idUsuario = resultado.getInt("id_usuario");
+                String tipo = resultado.getString("tipo");
+
+                SesionActual.idUsuario = idUsuario;
+                SesionActual.nombre = resultado.getString("nombre");
+                SesionActual.correo = resultado.getString("usuario");
+                SesionActual.telefono = resultado.getString("telefono");
+
+                // Recordar (o dejar de recordar) la cuenta en este equipo
+                if (chkRecordar.isSelected()) {
+                    Tienda.CuentasRecordadas.guardar(correo, contrasena);
+                } else {
+                    Tienda.CuentasRecordadas.eliminar(correo);
+                }
+
+                if ("ADMIN".equals(tipo)) {
+
+                    conexion.close();
+
+                    javax.swing.JOptionPane.showMessageDialog(this,
+                        "Bienvenido administrador");
+
+                    PanelAdministrador panel = new PanelAdministrador();
+                    panel.setVisible(true);
+                    this.dispose();
+                    return;
+                }
+
+                // Buscar el cliente relacionado con este usuario
+                String sqlCliente = "SELECT id_cliente FROM Cliente WHERE id_usuario = ?";
+
+                java.sql.PreparedStatement sentenciaCliente =
+                conexion.prepareStatement(sqlCliente);
+
+                sentenciaCliente.setInt(1, idUsuario);
+
+                java.sql.ResultSet resultadoCliente =
+                sentenciaCliente.executeQuery();
+
+                if (resultadoCliente.next()) {
+
+                    SesionActual.idCliente =
+                    resultadoCliente.getInt("id_cliente");
+
+                    javax.swing.JOptionPane.showMessageDialog(
+                        this,
+                        "Bienvenido, " + SesionActual.nombre
+                    );
+                } else {
+
+                    javax.swing.JOptionPane.showMessageDialog(
+                        this,
+                        "Este usuario no tiene un cliente asociado."
+                    );
+                }
+
+                resultadoCliente.close();
+                sentenciaCliente.close();
+
+                conexion.close();
+
+                VentanaInicioCliente inicio = new VentanaInicioCliente();
+                inicio.setVisible(true);
+                this.dispose();
+                return;
+
+            } else {
+
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "Correo o contraseña incorrectos");
+                conexion.close();
+            }
+
+        } catch (Exception e) {
+
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Error: " + e.getMessage());
+        }
+    }//GEN-LAST:event_btnIniciarSesionActionPerformed
+
+    private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
+        // TODO add your handling code here:
+if (!mostrandoRegistro) {
+    mostrarRegistro();
+}
+    String nombre = txtNombreRegistro.getText().trim();
+    String correo = txtCorreoRegistro.getText().trim().toLowerCase();
+    String contrasena = new String(txtContraseñaRegistro.getPassword()).trim();
+    String telefono = txtTelefonoRegistro.getText().trim();
+
+    if (nombre.isEmpty() || correo.isEmpty() || contrasena.isEmpty() || telefono.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Completa todos los campos");
+        return;
+    }
+
+    if (!nombre.matches("[a-zA-ZÁÉÍÓÚáéíóúÑñ ]+")) {
+        javax.swing.JOptionPane.showMessageDialog(this, "El nombre solo debe contener letras");
+        asegurarRegistro();
+        return;
+    }
+
+    if (nombre.length() < 3) {
+        javax.swing.JOptionPane.showMessageDialog(this, "El nombre debe tener al menos 3 letras");
+        asegurarRegistro();
+        return;
+    }
+
+   if (!correo.matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$")) {
+    javax.swing.JOptionPane.showMessageDialog(
+        this,
+        "Ingresa un correo de gmail valido (ejemplo: usuario@gmail.com)"
+    );
+    
+    asegurarRegistro();
+    return;
+}
+
+    if (contrasena.length() < 6) {
+        javax.swing.JOptionPane.showMessageDialog(this, "La contraseña debe tener al menos 6 caracteres");
+       asegurarRegistro();
+        return;
+    }
+
+    if (!telefono.matches("[0-9]+")) {
+        javax.swing.JOptionPane.showMessageDialog(this, "El telefono solo debe contener numeros");
+        asegurarRegistro();
+        return;
+    }
+
+    if (telefono.length() != 10) {
+        javax.swing.JOptionPane.showMessageDialog(this, "El telefono debe tener exactamente 10 digitos");
+        
+        asegurarRegistro();
+        return;
+    }
+
+    // Verificar que el correo no este ya registrado
+    try {
+
+        java.sql.Connection conexionCheck = Conexion.conectar();
+
+        String sqlCheckCorreo = "SELECT id_usuario FROM Usuario WHERE usuario = ?";
+        java.sql.PreparedStatement sentenciaCheckCorreo = conexionCheck.prepareStatement(sqlCheckCorreo);
+        sentenciaCheckCorreo.setString(1, correo);
+        java.sql.ResultSet resultadoCheckCorreo = sentenciaCheckCorreo.executeQuery();
+
+        if (resultadoCheckCorreo.next()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Ya existe una cuenta registrada con ese correo");
+            resultadoCheckCorreo.close();
+            sentenciaCheckCorreo.close();
+            conexionCheck.close();
+            asegurarRegistro();
+            return;
+        }
+        resultadoCheckCorreo.close();
+        sentenciaCheckCorreo.close();
+
+        // Verificar que el telefono no este ya registrado
+        String sqlCheckTelefono = "SELECT id_usuario FROM Usuario WHERE telefono = ?";
+        java.sql.PreparedStatement sentenciaCheckTelefono = conexionCheck.prepareStatement(sqlCheckTelefono);
+        sentenciaCheckTelefono.setString(1, telefono);
+        java.sql.ResultSet resultadoCheckTelefono = sentenciaCheckTelefono.executeQuery();
+
+        if (resultadoCheckTelefono.next()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Ya existe una cuenta registrada con ese telefono");
+            resultadoCheckTelefono.close();
+            sentenciaCheckTelefono.close();
+            conexionCheck.close();
+            asegurarRegistro();
+            return;
+        }
+        resultadoCheckTelefono.close();
+        sentenciaCheckTelefono.close();
+        conexionCheck.close();
+
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Error verificando los datos: " + e.getMessage());
+       asegurarRegistro();
+        return;
+    }
+
+   try {
+
+    java.sql.Connection conexion = Conexion.conectar();
+
+    String sql = "INSERT INTO Usuario (nombre, usuario, contrasena, tipo, telefono) " +
+                 "VALUES (?, ?, ?, ?, ?)";
+
+    java.sql.PreparedStatement sentencia =
+            conexion.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS);
+
+    sentencia.setString(1, nombre);
+    sentencia.setString(2, correo);
+    sentencia.setString(3, contrasena);
+    sentencia.setString(4, "CLIENTE");
+    sentencia.setString(5, telefono);
+
+    sentencia.executeUpdate();
+    
+
+    // Obtener el id del usuario recién creado
+    java.sql.ResultSet claves = sentencia.getGeneratedKeys();
+
+    if (claves.next()) {
+
+        int idUsuario = claves.getInt(1);
+        SesionActual.idUsuario = idUsuario;
+        SesionActual.nombre = nombre;
+        SesionActual.correo = correo;
+        SesionActual.telefono = telefono;
+        
+
+
+        // Crear el cliente relacionado con ese usuario
+        // Crear el cliente relacionado con ese usuario
+String sqlCliente =
+        "INSERT INTO Cliente (nombre, telefono, id_usuario) VALUES (?, ?, ?)";
+
+java.sql.PreparedStatement sentenciaCliente =
+        conexion.prepareStatement(
+                sqlCliente,
+                java.sql.Statement.RETURN_GENERATED_KEYS
+        );
+
+sentenciaCliente.setString(1, nombre);
+sentenciaCliente.setString(2, telefono);
+sentenciaCliente.setInt(3, idUsuario);
+
+sentenciaCliente.executeUpdate();
+
+// Obtener el id_cliente recién creado
+java.sql.ResultSet clavesCliente =
+        sentenciaCliente.getGeneratedKeys();
+
+if (clavesCliente.next()) {
+
+    int idCliente = clavesCliente.getInt(1);
+
+    // Guardar el cliente en la sesión
+    SesionActual.idCliente = idCliente;
+
+   
+}
+
+clavesCliente.close();
+sentenciaCliente.close();
+      
+
+    }
+
+    claves.close();
+    sentencia.close();
+
+    javax.swing.JOptionPane.showMessageDialog(
+            this,
+            "Cliente registrado correctamente"
+    );
+
+txtNombreRegistro.setText("");
+txtCorreoRegistro.setText("");
+txtContraseñaRegistro.setText("");
+txtTelefonoRegistro.setText("");
+    conexion.close();
+
+    VentanaInicioCliente inicio = new VentanaInicioCliente();
+    inicio.setVisible(true);
+    this.dispose();
+
+} catch (Exception e) {
+    javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    asegurarRegistro();   // <- agrega esta línea
+}
+     
+    }//GEN-LAST:event_btnRegistrarActionPerformed
+
+    private void txtNombreRegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreRegistroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNombreRegistroActionPerformed
+
+    private void txtTelefonoRegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTelefonoRegistroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtTelefonoRegistroActionPerformed
+
+    private void txtContraseñaRegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtContraseñaRegistroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtContraseñaRegistroActionPerformed
+
+    private void btnIrRegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIrRegistroActionPerformed
+mostrarRegistro();
+
+    }//GEN-LAST:event_btnIrRegistroActionPerformed
+
+    private void btnIrLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIrLoginActionPerformed
+
+mostrarLogin();
+
+    }//GEN-LAST:event_btnIrLoginActionPerformed
+
+    private void txtCorreoRegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCorreoRegistroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCorreoRegistroActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+             ex.printStackTrace();
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> new LoginAnimado().setVisible(true));
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnIniciarSesion;
+    private javax.swing.JButton btnIrLogin;
+    private javax.swing.JButton btnIrRegistro;
+    private javax.swing.JButton btnRegistrar;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel lblContraseña;
+    private javax.swing.JLabel lblContraseña1;
+    private javax.swing.JLabel lblCorreo;
+    private javax.swing.JLabel lblCorreo1;
+    private javax.swing.JLabel lblLogo;
+    private javax.swing.JLabel lblNombre;
+    private javax.swing.JLabel lblNombre1;
+    private javax.swing.JPanel panelLogin;
+    private javax.swing.JPanel panelRegistro;
+    private javax.swing.JPanel pnlAnimacion;
+    private javax.swing.JPasswordField txtContraseñaLogin;
+    private javax.swing.JPasswordField txtContraseñaRegistro;
+    private javax.swing.JTextField txtCorreoLogin;
+    private javax.swing.JTextField txtCorreoRegistro;
+    private javax.swing.JTextField txtNombreRegistro;
+    private javax.swing.JTextField txtTelefonoRegistro;
+    // End of variables declaration//GEN-END:variables
+}
